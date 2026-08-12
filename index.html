@@ -127,6 +127,15 @@
       animation: draw .34s ease-out;
     }
 
+    .playing-card:not(.empty) {
+      cursor: pointer;
+    }
+
+    .playing-card:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+    }
+
     @keyframes draw {
       0% { transform: translateY(18px) scale(.88) rotate(-2deg); opacity: .25; }
       100% { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
@@ -266,7 +275,7 @@
       <div class="legend-item">♠ Abdos</div>
     </section>
 
-    <section id="card" class="playing-card" aria-live="polite">
+    <section id="card" class="playing-card empty" aria-live="polite" role="button" tabindex="0" aria-label="Tirer une carte">
       <div class="placeholder">
         Appuie sur<br><strong>« Tirer une carte »</strong>
       </div>
@@ -377,6 +386,9 @@
       if (deck.length === 0) {
         drawButton.disabled = true;
         drawButton.textContent = "Paquet terminé";
+        cardEl.classList.add("empty");
+        cardEl.setAttribute("aria-disabled", "true");
+        cardEl.setAttribute("aria-label", "Paquet terminé");
       }
     }
 
@@ -386,7 +398,9 @@
       historyEl.innerHTML = "";
       drawButton.disabled = false;
       drawButton.textContent = "Tirer une carte";
-      cardEl.className = "playing-card";
+      cardEl.className = "playing-card empty";
+      cardEl.removeAttribute("aria-disabled");
+      cardEl.setAttribute("aria-label", "Tirer une carte");
       cardEl.innerHTML = `
         <div class="placeholder">
           Appuie sur<br><strong>« Tirer une carte »</strong>
@@ -395,6 +409,13 @@
     }
 
     drawButton.addEventListener("click", drawCard);
+    cardEl.addEventListener("click", drawCard);
+    cardEl.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        drawCard();
+      }
+    });
     resetButton.addEventListener("click", reset);
 
     reset();

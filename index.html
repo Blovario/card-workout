@@ -374,6 +374,8 @@
       if (deck.length === 0) return;
 
       const card = deck.pop();
+      cardEl.classList.remove("empty");
+      cardEl.removeAttribute("aria-disabled");
       renderCard(card);
       vibrate();
 

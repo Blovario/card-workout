@@ -148,7 +148,7 @@
       place-items: center;
       overflow: hidden;
       transform-origin: center;
-      touch-action: manipulation;
+      touch-action: none;
       user-select: none;
       -webkit-user-select: none;
     }
@@ -242,6 +242,7 @@
       background: var(--accent);
       color: #171300;
       box-shadow: 0 9px 24px rgba(0,0,0,.18);
+      touch-action: none;
     }
 
     #resetButton {
@@ -544,52 +545,14 @@
     }
 
     function addTolerantPress(element, handler) {
-      let activePress = null;
       let suppressClickUntil = 0;
-      const movementTolerance = 72;
 
       element.addEventListener("pointerdown", event => {
         if (event.pointerType !== "touch" && event.pointerType !== "pen") return;
 
-        activePress = {
-          pointerId: event.pointerId,
-          startX: event.clientX,
-          startY: event.clientY,
-          maxDistance: 0
-        };
-
-        element.setPointerCapture?.(event.pointerId);
-      });
-
-      element.addEventListener("pointermove", event => {
-        if (!activePress || event.pointerId !== activePress.pointerId) return;
-
-        const distance = Math.hypot(
-          event.clientX - activePress.startX,
-          event.clientY - activePress.startY
-        );
-        activePress.maxDistance = Math.max(activePress.maxDistance, distance);
-      });
-
-      element.addEventListener("pointerup", event => {
-        if (!activePress || event.pointerId !== activePress.pointerId) return;
-
-        const shouldActivate = activePress.maxDistance <= movementTolerance;
-        activePress = null;
-
-        if (element.hasPointerCapture?.(event.pointerId)) {
-          element.releasePointerCapture(event.pointerId);
-        }
-
-        if (shouldActivate) {
-          event.preventDefault();
-          suppressClickUntil = Date.now() + 1000;
-          handler();
-        }
-      });
-
-      element.addEventListener("pointercancel", () => {
-        activePress = null;
+        event.preventDefault();
+        suppressClickUntil = Date.now() + 1000;
+        handler();
       });
 
       element.addEventListener("click", event => {

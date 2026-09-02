@@ -78,6 +78,8 @@
       text-align: center;
     }
 
+    .counter[hidden] { display: none; }
+
     .counter strong {
       display: block;
       font-size: 23px;
@@ -98,12 +100,37 @@
     }
 
     .legend-item {
-      padding: 10px 12px;
+      min-width: 0;
+      padding: 9px 10px 9px 12px;
       border-radius: 13px;
       background: var(--panel);
       font-size: 14px;
       font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
     }
+
+    .legend-label {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .suit-count {
+      flex: 0 0 auto;
+      min-width: 28px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.16);
+      text-align: center;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .legend.hide-counts .suit-count { display: none; }
 
     .red { color: var(--danger); }
 
@@ -121,6 +148,9 @@
       place-items: center;
       overflow: hidden;
       transform-origin: center;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .playing-card.animate {
@@ -204,6 +234,8 @@
       font-weight: 850;
       cursor: pointer;
       touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     #drawButton {
@@ -234,6 +266,38 @@
       padding: 14px 16px;
       font-weight: 800;
       cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .settings-body {
+      display: grid;
+      gap: 2px;
+      padding: 0 12px 12px;
+    }
+
+    .setting {
+      min-height: 48px;
+      padding: 8px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .setting + .setting {
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+
+    .setting input {
+      flex: 0 0 auto;
+      width: 22px;
+      height: 22px;
+      margin: 0;
+      accent-color: var(--accent);
     }
 
     ol {
@@ -262,17 +326,29 @@
         <h1>Card Workout</h1>
         <p class="subtitle">Une carte = un exercice</p>
       </div>
-      <div class="counter">
+      <div id="totalCounter" class="counter">
         <strong id="remaining">52</strong>
         <span>restantes</span>
       </div>
     </header>
 
-    <section class="legend" aria-label="Correspondance des couleurs">
-      <div class="legend-item"><span class="red">♥</span> Burpees</div>
-      <div class="legend-item"><span class="red">♦</span> Squats</div>
-      <div class="legend-item">♣ Pompes</div>
-      <div class="legend-item">♠ Abdos</div>
+    <section id="legend" class="legend" aria-label="Correspondance des couleurs">
+      <div class="legend-item">
+        <span class="legend-label"><span class="red">♥</span> Burpees</span>
+        <span class="suit-count" data-suit="♥" aria-label="13 cartes restantes">13</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-label"><span class="red">♦</span> Squats</span>
+        <span class="suit-count" data-suit="♦" aria-label="13 cartes restantes">13</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-label">♣ Pompes</span>
+        <span class="suit-count" data-suit="♣" aria-label="13 cartes restantes">13</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-label">♠ Abdos</span>
+        <span class="suit-count" data-suit="♠" aria-label="13 cartes restantes">13</span>
+      </div>
     </section>
 
     <section id="card" class="playing-card empty" aria-live="polite" role="button" tabindex="0" aria-label="Tirer une carte">
@@ -289,6 +365,20 @@
     <details>
       <summary>Historique des tirages</summary>
       <ol id="history"></ol>
+    </details>
+
+    <details class="settings">
+      <summary>Options d’affichage</summary>
+      <div class="settings-body">
+        <label class="setting">
+          <span>Compteur total en haut</span>
+          <input id="showTotalCounter" type="checkbox" checked />
+        </label>
+        <label class="setting">
+          <span>Cartes restantes par couleur</span>
+          <input id="showSuitCounters" type="checkbox" checked />
+        </label>
+      </div>
     </details>
 
     <p class="note">As = 14 · Valet = 11 · Dame = 12 · Roi = 13</p>
@@ -319,12 +409,19 @@
     ];
 
     const cardEl = document.getElementById("card");
+    const totalCounterEl = document.getElementById("totalCounter");
     const remainingEl = document.getElementById("remaining");
+    const legendEl = document.getElementById("legend");
+    const suitCounterEls = [...document.querySelectorAll(".suit-count")];
     const historyEl = document.getElementById("history");
     const drawButton = document.getElementById("drawButton");
     const resetButton = document.getElementById("resetButton");
+    const showTotalCounterInput = document.getElementById("showTotalCounter");
+    const showSuitCountersInput = document.getElementById("showSuitCounters");
 
+    const preferenceKey = "card-workout-display";
     let deck = [];
+    let displayPreferences = loadDisplayPreferences();
 
     function buildDeck() {
       return suits.flatMap(suit =>
@@ -338,6 +435,42 @@
         [cards[i], cards[j]] = [cards[j], cards[i]];
       }
       return cards;
+    }
+
+    function loadDisplayPreferences() {
+      const defaults = { showTotalCounter: true, showSuitCounters: true };
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(preferenceKey));
+        return saved ? { ...defaults, ...saved } : defaults;
+      } catch {
+        return defaults;
+      }
+    }
+
+    function saveDisplayPreferences() {
+      try {
+        localStorage.setItem(preferenceKey, JSON.stringify(displayPreferences));
+      } catch {
+        // L’application reste utilisable si le stockage local est indisponible.
+      }
+    }
+
+    function applyDisplayPreferences() {
+      totalCounterEl.hidden = !displayPreferences.showTotalCounter;
+      legendEl.classList.toggle("hide-counts", !displayPreferences.showSuitCounters);
+      showTotalCounterInput.checked = displayPreferences.showTotalCounter;
+      showSuitCountersInput.checked = displayPreferences.showSuitCounters;
+    }
+
+    function updateCounters() {
+      remainingEl.textContent = deck.length;
+
+      suitCounterEls.forEach(counterEl => {
+        const remainingForSuit = deck.filter(card => card.symbol === counterEl.dataset.suit).length;
+        counterEl.textContent = remainingForSuit;
+        counterEl.setAttribute("aria-label", `${remainingForSuit} cartes restantes`);
+      });
     }
 
     function vibrate() {
@@ -383,7 +516,7 @@
       item.textContent = `${card.name} de ${card.suitName} — ${card.reps} ${card.exercise.toLowerCase()}`;
       historyEl.prepend(item);
 
-      remainingEl.textContent = deck.length;
+      updateCounters();
 
       if (deck.length === 0) {
         drawButton.disabled = true;
@@ -396,7 +529,7 @@
 
     function reset() {
       deck = shuffle(buildDeck());
-      remainingEl.textContent = deck.length;
+      updateCounters();
       historyEl.innerHTML = "";
       drawButton.disabled = false;
       drawButton.textContent = "Tirer une carte";
@@ -410,16 +543,88 @@
       `;
     }
 
-    drawButton.addEventListener("click", drawCard);
-    cardEl.addEventListener("click", drawCard);
+    function addTolerantPress(element, handler) {
+      let activePress = null;
+      let suppressClickUntil = 0;
+      const movementTolerance = 72;
+
+      element.addEventListener("pointerdown", event => {
+        if (event.pointerType !== "touch" && event.pointerType !== "pen") return;
+
+        activePress = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          maxDistance: 0
+        };
+
+        element.setPointerCapture?.(event.pointerId);
+      });
+
+      element.addEventListener("pointermove", event => {
+        if (!activePress || event.pointerId !== activePress.pointerId) return;
+
+        const distance = Math.hypot(
+          event.clientX - activePress.startX,
+          event.clientY - activePress.startY
+        );
+        activePress.maxDistance = Math.max(activePress.maxDistance, distance);
+      });
+
+      element.addEventListener("pointerup", event => {
+        if (!activePress || event.pointerId !== activePress.pointerId) return;
+
+        const shouldActivate = activePress.maxDistance <= movementTolerance;
+        activePress = null;
+
+        if (element.hasPointerCapture?.(event.pointerId)) {
+          element.releasePointerCapture(event.pointerId);
+        }
+
+        if (shouldActivate) {
+          event.preventDefault();
+          suppressClickUntil = Date.now() + 1000;
+          handler();
+        }
+      });
+
+      element.addEventListener("pointercancel", () => {
+        activePress = null;
+      });
+
+      element.addEventListener("click", event => {
+        if (Date.now() < suppressClickUntil) {
+          event.preventDefault();
+          return;
+        }
+
+        handler();
+      });
+    }
+
+    addTolerantPress(drawButton, drawCard);
+    addTolerantPress(cardEl, drawCard);
+
     cardEl.addEventListener("keydown", event => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         drawCard();
       }
     });
-    resetButton.addEventListener("click", reset);
 
+    resetButton.addEventListener("click", reset);
+    showTotalCounterInput.addEventListener("change", () => {
+      displayPreferences.showTotalCounter = showTotalCounterInput.checked;
+      applyDisplayPreferences();
+      saveDisplayPreferences();
+    });
+    showSuitCountersInput.addEventListener("change", () => {
+      displayPreferences.showSuitCounters = showSuitCountersInput.checked;
+      applyDisplayPreferences();
+      saveDisplayPreferences();
+    });
+
+    applyDisplayPreferences();
     reset();
   </script>
 </body>

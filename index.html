@@ -51,22 +51,21 @@
 
     header {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
       gap: 12px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(26px, 8vw, 38px);
-      line-height: 1;
-      letter-spacing: -.04em;
+    .display-options,
+    .header-counters {
+      display: flex;
+      align-items: center;
+      gap: 9px;
     }
 
-    .subtitle {
-      margin: 7px 0 0;
-      color: var(--muted);
-      font-size: 14px;
+    .display-options {
+      min-width: 0;
+      flex-wrap: nowrap;
     }
 
     .counter {
@@ -219,7 +218,7 @@
 
     .actions {
       display: grid;
-      grid-template-columns: 1fr auto auto;
+      grid-template-columns: 1fr auto;
       gap: 10px;
     }
 
@@ -250,12 +249,6 @@
       background: var(--panel);
       color: #fff;
       font-size: 24px;
-    }
-
-    #stopButton {
-      min-width: 76px;
-      background: #ef5350;
-      color: #fff;
     }
 
     .timer {
@@ -294,33 +287,24 @@
       touch-action: manipulation;
     }
 
-    .settings-body {
-      display: grid;
-      gap: 2px;
-      padding: 0 12px 12px;
-    }
-
     .setting {
-      min-height: 48px;
-      padding: 8px 6px;
+      min-height: 0;
+      padding: 5px 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 6px;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-    }
-
-    .setting + .setting {
-      border-top: 1px solid rgba(255,255,255,.10);
+      white-space: nowrap;
     }
 
     .setting input {
       flex: 0 0 auto;
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       margin: 0;
       accent-color: var(--accent);
     }
@@ -347,17 +331,25 @@
 <body>
   <main>
     <header>
-      <div>
-        <h1>Card Workout</h1>
-        <p class="subtitle">Une carte = un exercice</p>
+      <div class="display-options" aria-label="Options d’affichage">
+        <label class="setting">
+          <span>Total</span>
+          <input id="showTotalCounter" type="checkbox" checked />
+        </label>
+        <label class="setting">
+          <span>Couleurs</span>
+          <input id="showSuitCounters" type="checkbox" checked />
+        </label>
       </div>
-      <div id="totalCounter" class="counter">
-        <strong id="remaining">52</strong>
-        <span>restantes</span>
-      </div>
-      <div class="counter timer" aria-label="Chronomètre">
-        <strong id="timer">00:00</strong>
-        <span>chrono</span>
+      <div class="header-counters">
+        <div id="totalCounter" class="counter">
+          <strong id="remaining">52</strong>
+          <span>restantes</span>
+        </div>
+        <div class="counter timer" aria-label="Chronomètre">
+          <strong id="timer">00:00</strong>
+          <span>chrono</span>
+        </div>
       </div>
     </header>
 
@@ -388,27 +380,12 @@
 
     <section class="actions">
       <button id="drawButton" type="button">Tirer une carte</button>
-      <button id="stopButton" type="button" disabled>Stop</button>
       <button id="resetButton" type="button" aria-label="Recommencer">↻</button>
     </section>
 
     <details>
       <summary>Historique des tirages</summary>
       <ol id="history"></ol>
-    </details>
-
-    <details class="settings">
-      <summary>Options d’affichage</summary>
-      <div class="settings-body">
-        <label class="setting">
-          <span>Compteur total en haut</span>
-          <input id="showTotalCounter" type="checkbox" checked />
-        </label>
-        <label class="setting">
-          <span>Cartes restantes par couleur</span>
-          <input id="showSuitCounters" type="checkbox" checked />
-        </label>
-      </div>
     </details>
 
     <p class="note">As = 14 · Valet = 11 · Dame = 12 · Roi = 13</p>
@@ -445,7 +422,6 @@
     const suitCounterEls = [...document.querySelectorAll(".suit-count")];
     const historyEl = document.getElementById("history");
     const drawButton = document.getElementById("drawButton");
-    const stopButton = document.getElementById("stopButton");
     const resetButton = document.getElementById("resetButton");
     const timerEl = document.getElementById("timer");
     const showTotalCounterInput = document.getElementById("showTotalCounter");
@@ -530,7 +506,6 @@
 
       timerHasStarted = true;
       timerStartedAt = Date.now();
-      stopButton.disabled = false;
       updateTimer();
       timerInterval = window.setInterval(updateTimer, 250);
     }
@@ -539,7 +514,8 @@
       if (timerInterval !== null) window.clearInterval(timerInterval);
       timerInterval = null;
       updateTimer();
-      stopButton.disabled = true;
+      drawButton.disabled = true;
+      drawButton.textContent = "Terminé";
     }
 
     function renderCard(card) {
@@ -585,8 +561,7 @@
       updateCounters();
 
       if (deck.length === 0) {
-        drawButton.disabled = true;
-        drawButton.textContent = "Paquet terminé";
+        drawButton.textContent = "Stop";
         cardEl.classList.add("empty");
         cardEl.setAttribute("aria-disabled", "true");
         cardEl.setAttribute("aria-label", "Paquet terminé");
@@ -599,7 +574,6 @@
       timerStartedAt = null;
       timerHasStarted = false;
       timerEl.textContent = "00:00";
-      stopButton.disabled = true;
       deck = shuffle(buildDeck());
       updateCounters();
       historyEl.innerHTML = "";
@@ -636,7 +610,10 @@
       });
     }
 
-    addTolerantPress(drawButton, drawCard);
+    addTolerantPress(drawButton, () => {
+      if (deck.length === 0) stopTimer();
+      else drawCard();
+    });
     addTolerantPress(cardEl, drawCard);
 
     cardEl.addEventListener("keydown", event => {
@@ -647,7 +624,6 @@
     });
 
     resetButton.addEventListener("click", reset);
-    stopButton.addEventListener("click", stopTimer);
     showTotalCounterInput.addEventListener("change", () => {
       displayPreferences.showTotalCounter = showTotalCounterInput.checked;
       applyDisplayPreferences();

@@ -219,7 +219,7 @@
 
     .actions {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr auto auto;
       gap: 10px;
     }
 
@@ -250,6 +250,30 @@
       background: var(--panel);
       color: #fff;
       font-size: 24px;
+    }
+
+    #stopButton {
+      min-width: 76px;
+      background: #ef5350;
+      color: #fff;
+    }
+
+    .timer {
+      min-width: 92px;
+      text-align: center;
+    }
+
+    .timer strong {
+      display: block;
+      font-size: 22px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+
+    .timer span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
     }
 
     button:disabled {
@@ -331,6 +355,10 @@
         <strong id="remaining">52</strong>
         <span>restantes</span>
       </div>
+      <div class="counter timer" aria-label="Chronomètre">
+        <strong id="timer">00:00</strong>
+        <span>chrono</span>
+      </div>
     </header>
 
     <section id="legend" class="legend" aria-label="Correspondance des couleurs">
@@ -360,6 +388,7 @@
 
     <section class="actions">
       <button id="drawButton" type="button">Tirer une carte</button>
+      <button id="stopButton" type="button" disabled>Stop</button>
       <button id="resetButton" type="button" aria-label="Recommencer">↻</button>
     </section>
 
@@ -416,13 +445,18 @@
     const suitCounterEls = [...document.querySelectorAll(".suit-count")];
     const historyEl = document.getElementById("history");
     const drawButton = document.getElementById("drawButton");
+    const stopButton = document.getElementById("stopButton");
     const resetButton = document.getElementById("resetButton");
+    const timerEl = document.getElementById("timer");
     const showTotalCounterInput = document.getElementById("showTotalCounter");
     const showSuitCountersInput = document.getElementById("showSuitCounters");
 
     const preferenceKey = "card-workout-display";
     let deck = [];
     let displayPreferences = loadDisplayPreferences();
+    let timerStartedAt = null;
+    let timerInterval = null;
+    let timerHasStarted = false;
 
     function buildDeck() {
       return suits.flatMap(suit =>
@@ -478,6 +512,36 @@
       if ("vibrate" in navigator) navigator.vibrate(35);
     }
 
+    function formatDuration(milliseconds) {
+      const totalSeconds = Math.floor(milliseconds / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function updateTimer() {
+      if (timerStartedAt !== null) {
+        timerEl.textContent = formatDuration(Date.now() - timerStartedAt);
+      }
+    }
+
+    function startTimer() {
+      if (timerHasStarted) return;
+
+      timerHasStarted = true;
+      timerStartedAt = Date.now();
+      stopButton.disabled = false;
+      updateTimer();
+      timerInterval = window.setInterval(updateTimer, 250);
+    }
+
+    function stopTimer() {
+      if (timerInterval !== null) window.clearInterval(timerInterval);
+      timerInterval = null;
+      updateTimer();
+      stopButton.disabled = true;
+    }
+
     function renderCard(card) {
       const redClass = card.color === "red" ? "red" : "";
 
@@ -507,6 +571,7 @@
     function drawCard() {
       if (deck.length === 0) return;
 
+      startTimer();
       const card = deck.pop();
       cardEl.classList.remove("empty");
       cardEl.removeAttribute("aria-disabled");
@@ -529,6 +594,12 @@
     }
 
     function reset() {
+      if (timerInterval !== null) window.clearInterval(timerInterval);
+      timerInterval = null;
+      timerStartedAt = null;
+      timerHasStarted = false;
+      timerEl.textContent = "00:00";
+      stopButton.disabled = true;
       deck = shuffle(buildDeck());
       updateCounters();
       historyEl.innerHTML = "";
@@ -576,6 +647,7 @@
     });
 
     resetButton.addEventListener("click", reset);
+    stopButton.addEventListener("click", stopTimer);
     showTotalCounterInput.addEventListener("change", () => {
       displayPreferences.showTotalCounter = showTotalCounterInput.checked;
       applyDisplayPreferences();

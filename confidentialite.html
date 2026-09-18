@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#064527" />
+  <meta name="description" content="Politique de confidentialité de l’application DeckBurn." />
+  <title>Politique de confidentialité — DeckBurn</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #064527;
+      --background-top: #0b6d40;
+      --panel: rgba(255, 255, 255, .1);
+      --border: rgba(255, 255, 255, .13);
+      --text: #fff;
+      --muted: rgba(255, 255, 255, .75);
+      --accent: #ffd84d;
+      --accent-text: #171300;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-height: 100%;
+      background: var(--background);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      padding:
+        calc(24px + env(safe-area-inset-top))
+        18px
+        calc(32px + env(safe-area-inset-bottom));
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, .1), transparent 34rem),
+        linear-gradient(180deg, var(--background-top), var(--background));
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    main {
+      width: min(100%, 760px);
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 28px;
+      color: var(--text);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .back-link span {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--panel);
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .hero {
+      margin-bottom: 24px;
+      padding: clamp(24px, 6vw, 44px);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: rgba(0, 0, 0, .13);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, .2);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 8vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+
+    .intro {
+      max-width: 62ch;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .updated {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    article {
+      display: grid;
+      gap: 14px;
+    }
+
+    section {
+      padding: clamp(20px, 5vw, 30px);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    p { margin: 0 0 12px; }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 22px;
+    }
+
+    li + li { margin-top: 8px; }
+
+    a {
+      color: var(--accent);
+      text-underline-offset: 3px;
+    }
+
+    .identity {
+      color: var(--muted);
+    }
+
+    .identity strong { color: var(--text); }
+
+    footer {
+      padding: 30px 8px 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back-link" href="index.html"><span aria-hidden="true">‹</span> DeckBurn</a>
+
+    <header class="hero">
+      <p class="eyebrow">DeckBurn</p>
+      <h1>Politique de confidentialité</h1>
+      <p class="intro">
+        Cette politique explique comment les données sont utilisées lorsque vous utilisez
+        l’application DeckBurn sur iOS.
+      </p>
+      <time class="updated" datetime="2026-09-17">Mise à jour : 17 septembre 2026</time>
+    </header>
+
+    <article>
+      <section>
+        <h2>1. Responsable du traitement</h2>
+        <p class="identity">
+          <strong>ESREF AKSU (AKSU WORKS)</strong><br />
+          Entrepreneur individuel — SIREN 992 228 031<br />
+          1 rue Marguerin, 75014 Paris, France
+        </p>
+        <p>
+          Toute question relative à la confidentialité ou demande d’exercice de droits peut être
+          adressée par courrier à cette adresse professionnelle.
+        </p>
+      </section>
+
+      <section>
+        <h2>2. Données enregistrées par DeckBurn</h2>
+        <p>
+          DeckBurn ne demande pas la création d’un compte et ne collecte directement ni nom,
+          ni adresse e-mail, ni donnée de santé.
+        </p>
+        <p>Les informations suivantes sont enregistrées uniquement sur votre appareil :</p>
+        <ul>
+          <li>vos préférences d’affichage ;</li>
+          <li>les réglages du minuteur Tabata ;</li>
+          <li>l’état de la séance en cours et l’historique des cartes tirées.</li>
+        </ul>
+        <p>
+          Elles servent à restaurer vos réglages et votre séance. Elles ne sont pas transmises à
+          AKSU WORKS et sont supprimées lorsque vous effacez les données de l’application ou la
+          désinstallez.
+        </p>
+      </section>
+
+      <section>
+        <h2>3. Publicités et données traitées par Google</h2>
+        <p>
+          L’application utilise Google AdMob pour afficher des publicités et Google User Messaging
+          Platform (UMP) pour recueillir et mémoriser vos choix de confidentialité.
+        </p>
+        <p>Selon votre appareil, votre région et vos choix, Google et ses partenaires peuvent traiter :</p>
+        <ul>
+          <li>l’adresse IP et une localisation approximative qui peut en être déduite ;</li>
+          <li>des identifiants de l’appareil ou identifiants publicitaires, lorsque leur utilisation est autorisée ;</li>
+          <li>des informations techniques, diagnostics et données de performance ;</li>
+          <li>les interactions avec les publicités, notamment les impressions et les clics.</li>
+        </ul>
+        <p>
+          Ces traitements peuvent servir à fournir des annonces, mesurer leur performance, limiter
+          leur fréquence, lutter contre la fraude et, lorsque vous y consentez, personnaliser les
+          publicités. Consultez les informations de Google sur
+          <a href="https://policies.google.com/technologies/partner-sites?hl=fr" rel="noopener noreferrer">l’utilisation des données provenant d’applications partenaires</a>
+          et sa <a href="https://policies.google.com/privacy?hl=fr" rel="noopener noreferrer">politique de confidentialité</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Consentement et contrôle de vos choix</h2>
+        <p>
+          Lorsque la réglementation l’exige, un formulaire de consentement Google est présenté
+          avant toute demande publicitaire. DeckBurn ne demande pas l’autorisation Apple de suivi
+          entre applications et sites web (ATT).
+        </p>
+        <p>
+          Vous pouvez refuser le suivi ou la personnalisation sans perdre l’accès aux fonctions de
+          DeckBurn. Lorsque l’option est requise dans votre région, le lien « Choix de
+          confidentialité des publicités » affiché dans l’application permet de modifier votre
+          décision à tout moment.
+        </p>
+      </section>
+
+      <section>
+        <h2>5. Bases juridiques</h2>
+        <p>Selon le traitement concerné, les données publicitaires sont traitées sur la base :</p>
+        <ul>
+          <li>de votre consentement, notamment pour la personnalisation et l’accès à certains identifiants ;</li>
+          <li>des obligations légales applicables ;</li>
+          <li>des intérêts légitimes de Google ou de ses partenaires, lorsque la réglementation l’autorise, notamment pour la sécurité, la prévention de la fraude et certaines mesures publicitaires.</li>
+        </ul>
+        <p>Les finalités et bases applicables sont détaillées dans le formulaire de confidentialité affiché dans l’application.</p>
+      </section>
+
+      <section>
+        <h2>6. Destinataires et transferts</h2>
+        <p>
+          AKSU WORKS ne vend aucune donnée personnelle. Les données liées à la publicité peuvent
+          être traitées par Google Ireland Limited, les sociétés du groupe Google et les fournisseurs
+          de technologies publicitaires indiqués dans le formulaire de consentement.
+        </p>
+        <p>
+          Certains destinataires peuvent être situés hors de l’Espace économique européen. Google
+          indique encadrer ces transferts au moyen des mécanismes reconnus par la réglementation
+          applicable, notamment les clauses contractuelles types lorsque cela est nécessaire.
+        </p>
+      </section>
+
+      <section>
+        <h2>7. Durées de conservation</h2>
+        <p>
+          Les réglages et séances conservés localement restent sur votre appareil jusqu’à leur
+          réinitialisation, l’effacement des données de l’application ou sa désinstallation. Pour les
+          données traitées par Google et ses partenaires, les durées de conservation sont définies
+          dans leurs propres politiques et selon vos choix de consentement.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Vos droits</h2>
+        <p>
+          Selon votre situation, vous pouvez demander l’accès, la rectification, l’effacement, la
+          limitation ou l’opposition au traitement de vos données, ainsi que retirer votre consentement.
+          Vous pouvez adresser votre demande au responsable du traitement par courrier à l’adresse
+          indiquée ci-dessus.
+        </p>
+        <p>
+          Vous pouvez également déposer une réclamation auprès de la
+          <a href="https://www.cnil.fr/fr/plaintes" rel="noopener noreferrer">Commission nationale de l’informatique et des libertés (CNIL)</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2>9. Enfants</h2>
+        <p>
+          DeckBurn est une application générale d’entraînement et n’est pas spécifiquement
+          destinée aux enfants. AKSU WORKS ne collecte pas sciemment de données personnelles
+          directement auprès d’enfants.
+        </p>
+      </section>
+
+      <section>
+        <h2>10. Modifications</h2>
+        <p>
+          Cette politique peut être mise à jour pour refléter une évolution de l’application, des
+          services publicitaires ou de la réglementation. La date de mise à jour affichée en haut de
+          cette page permet d’identifier la version en vigueur.
+        </p>
+      </section>
+    </article>
+
+    <footer>© 2026 AKSU WORKS — DeckBurn</footer>
+  </main>
+</body>
+</html>

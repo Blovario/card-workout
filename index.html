@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0b5d36" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="DeckBurn" />
+  <title>DeckBurn</title>
+
+  <style>
+    :root {
+      --bg: #074b2c;
+      --panel: rgba(255,255,255,.10);
+      --text: #fff;
+      --muted: rgba(255,255,255,.72);
+      --accent: #ffd84d;
+      --danger: #df3048;
+      --card-text: #111;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,.08), transparent 40%),
+        linear-gradient(180deg, #0b6d40, var(--bg));
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100dvh;
+      padding:
+        calc(16px + env(safe-area-inset-top))
+        16px
+        calc(20px + env(safe-area-inset-bottom));
+      display: flex;
+      justify-content: center;
+    }
+
+    main {
+      width: min(100%, 520px);
+    }
+
+    .app-view {
+      min-height: calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+
+    .cards-view {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .app-view[hidden] {
+      display: none;
+    }
+
+    .mode-selector {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 5px;
+      border-radius: 16px;
+      background: var(--panel);
+    }
+
+    .mode-button {
+      min-height: 42px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .mode-button.active {
+      background: var(--accent);
+      color: #171300;
+    }
+
+    .cards-mode {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .display-options,
+    .header-counters {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .display-options {
+      min-width: 0;
+      flex-wrap: nowrap;
+    }
+
+    .counter {
+      flex: 0 0 auto;
+      padding: 10px 13px;
+      border-radius: 14px;
+      background: var(--panel);
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+
+    .counter[hidden] { display: none; }
+
+    .counter strong {
+      display: block;
+      font-size: 23px;
+      line-height: 1;
+    }
+
+    .counter span {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .legend-item {
+      min-width: 0;
+      padding: 9px 10px 9px 12px;
+      border-radius: 13px;
+      background: var(--panel);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .legend-label {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .suit-count {
+      flex: 0 0 auto;
+      min-width: 28px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.16);
+      text-align: center;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .legend.hide-counts .suit-count { display: none; }
+
+    .red { color: var(--danger); }
+
+    .playing-card {
+      position: relative;
+      width: min(72vw, 285px);
+      aspect-ratio: 5 / 7;
+      margin: 4px auto;
+      padding: 20px;
+      border-radius: 24px;
+      background: #fff;
+      color: var(--card-text);
+      box-shadow: 0 22px 50px rgba(0,0,0,.28);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      transform-origin: center;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .playing-card.animate {
+      animation: draw .34s ease-out;
+    }
+
+    .playing-card:not(.empty) {
+      cursor: pointer;
+    }
+
+    .playing-card:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    @keyframes draw {
+      0% { transform: translateY(18px) scale(.88) rotate(-2deg); opacity: .25; }
+      100% { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+    }
+
+    .corner {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-weight: 900;
+      font-size: 27px;
+      line-height: .9;
+    }
+
+    .corner.top { top: 16px; left: 16px; }
+    .corner.bottom { right: 16px; bottom: 16px; transform: rotate(180deg); }
+
+    .center {
+      text-align: center;
+    }
+
+    .suit {
+      font-size: clamp(78px, 26vw, 120px);
+      line-height: .85;
+    }
+
+    .reps {
+      margin-top: 16px;
+      font-size: clamp(48px, 16vw, 76px);
+      line-height: .9;
+      font-weight: 950;
+      letter-spacing: -.06em;
+    }
+
+    .exercise {
+      margin-top: 8px;
+      font-size: clamp(19px, 6vw, 28px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .placeholder {
+      color: #777;
+      font-size: 20px;
+      font-weight: 750;
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 17px;
+      min-height: 58px;
+      padding: 0 20px;
+      font: inherit;
+      font-size: 18px;
+      font-weight: 850;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #drawButton {
+      background: var(--accent);
+      color: #171300;
+      box-shadow: 0 9px 24px rgba(0,0,0,.18);
+      touch-action: none;
+    }
+
+    #resetButton {
+      width: 62px;
+      background: var(--panel);
+      color: #fff;
+      font-size: 24px;
+    }
+
+    .timer {
+      min-width: 92px;
+      text-align: center;
+    }
+
+    .timer strong {
+      display: block;
+      font-size: 22px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+
+    .timer span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: default;
+    }
+
+    details {
+      border-radius: 15px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    summary {
+      padding: 14px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .setting {
+      min-height: 0;
+      padding: 5px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .setting input {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    ol {
+      max-height: 190px;
+      overflow-y: auto;
+      margin: 0;
+      padding: 0 18px 16px 43px;
+      color: var(--muted);
+    }
+
+    li { padding: 5px 0; }
+
+    .note {
+      margin: 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tabata-panel {
+      display: grid;
+      gap: 14px;
+      padding: 22px 16px;
+      border-radius: 22px;
+      background: var(--panel);
+      text-align: center;
+    }
+
+    .tabata-view {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .tabata-header {
+      display: grid;
+      grid-template-columns: 48px 1fr 48px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tabata-header h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 22px;
+    }
+
+    #tabataBackButton {
+      min-height: 48px;
+      padding: 0;
+      border-radius: 14px;
+      background: var(--panel);
+      color: #fff;
+      font-size: 26px;
+    }
+
+    .tabata-phase {
+      margin: 0;
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .tabata-time {
+      font-size: clamp(78px, 26vw, 118px);
+      font-weight: 950;
+      letter-spacing: -.07em;
+      line-height: .85;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tabata-round {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .tabata-settings {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .tabata-setting {
+      display: grid;
+      gap: 5px;
+      padding: 10px 8px;
+      border-radius: 13px;
+      background: rgba(0,0,0,.13);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .tabata-setting input {
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      padding: 5px;
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      font: inherit;
+      font-size: 19px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .tabata-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+
+    #tabataStartButton {
+      background: var(--accent);
+      color: #171300;
+    }
+
+    #tabataResetButton {
+      width: 62px;
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      font-size: 24px;
+    }
+
+    .legal-footer {
+      padding: 22px 0 4px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .legal-footer a {
+      color: var(--muted);
+      text-underline-offset: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div id="cardsView" class="app-view cards-view">
+      <nav class="mode-selector" aria-label="Mode d’entraînement">
+        <button id="cardsModeButton" class="mode-button active" type="button" aria-pressed="true">Cartes</button>
+        <button id="tabataModeButton" class="mode-button" type="button" aria-pressed="false">Tabata</button>
+      </nav>
+
+      <header id="cardsHeader">
+      <div class="display-options" aria-label="Options d’affichage">
+        <label class="setting">
+          <span>Total</span>
+          <input id="showTotalCounter" type="checkbox" checked />
+        </label>
+        <label class="setting">
+          <span>Couleurs</span>
+          <input id="showSuitCounters" type="checkbox" checked />
+        </label>
+      </div>
+      <div class="header-counters">
+        <div id="totalCounter" class="counter">
+          <strong id="remaining">52</strong>
+          <span>restantes</span>
+        </div>
+        <div class="counter timer" aria-label="Chronomètre">
+          <strong id="timer">00:00</strong>
+          <span>chrono</span>
+        </div>
+      </div>
+      </header>
+
+      <section id="cardsMode" class="cards-mode">
+      <section id="legend" class="legend" aria-label="Correspondance des couleurs">
+      <div class="legend-item">
+        <span class="legend-label"><span class="red">♥</span> Burpees</span>
+        <span class="suit-count" data-suit="♥" aria-label="13 cartes restantes">13</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-label"><span class="red">♦</span> Squats</span>
+        <span class="suit-count" data-suit="♦" aria-label="13 cartes restantes">13</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-label">♣ Pompes</span>
+        <span class="suit-count" data-suit="♣" aria-label="13 cartes restantes">13</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-label">♠ Abdos</span>
+        <span class="suit-count" data-suit="♠" aria-label="13 cartes restantes">13</span>
+      </div>
+      </section>
+
+      <section id="card" class="playing-card empty" aria-live="polite" role="button" tabindex="0" aria-label="Tirer une carte">
+      <div class="placeholder">
+        Appuie sur<br><strong>« Tirer une carte »</strong>
+      </div>
+      </section>
+
+      <section class="actions">
+      <button id="drawButton" type="button">Tirer une carte</button>
+      <button id="resetButton" type="button" aria-label="Recommencer">↻</button>
+      </section>
+
+      <details>
+      <summary>Historique des tirages</summary>
+      <ol id="history"></ol>
+      </details>
+
+      <p class="note">As = 14 · Valet = 11 · Dame = 12 · Roi = 13</p>
+      </section>
+    </div>
+
+    <section id="tabataMode" class="app-view tabata-view" hidden>
+      <header class="tabata-header">
+        <button id="tabataBackButton" type="button" aria-label="Retour aux cartes">‹</button>
+        <h1>Tabata</h1>
+        <span aria-hidden="true"></span>
+      </header>
+      <div class="tabata-panel">
+        <p id="tabataPhase" class="tabata-phase">Prêt</p>
+        <div id="tabataTime" class="tabata-time">20</div>
+        <div id="tabataRound" class="tabata-round">8 tours · 20 s effort / 10 s repos</div>
+
+        <div class="tabata-settings">
+          <label class="tabata-setting">Effort (s)<input id="tabataWorkInput" type="number" min="1" max="3600" value="20" inputmode="numeric" /></label>
+          <label class="tabata-setting">Repos (s)<input id="tabataRestInput" type="number" min="0" max="3600" value="10" inputmode="numeric" /></label>
+          <label class="tabata-setting">Tours<input id="tabataRoundsInput" type="number" min="1" max="99" value="8" inputmode="numeric" /></label>
+        </div>
+
+        <div class="tabata-actions">
+          <button id="tabataStartButton" type="button">Démarrer</button>
+          <button id="tabataResetButton" type="button" aria-label="Réinitialiser le Tabata">↻</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="legal-footer">
+      <a href="confidentialite.html">Politique de confidentialité</a>
+    </footer>
+  </main>
+
+  <script>
+    const suits = [
+      { suitName: "Cœur", symbol: "♥", color: "red", exercise: "Burpees" },
+      { suitName: "Carreau", symbol: "♦", color: "red", exercise: "Squats" },
+      { suitName: "Trèfle", symbol: "♣", color: "black", exercise: "Pompes" },
+      { suitName: "Pique", symbol: "♠", color: "black", exercise: "Abdos" }
+    ];
+
+    const values = [
+      { name: "As", label: "A", reps: 14 },
+      { name: "2", label: "2", reps: 2 },
+      { name: "3", label: "3", reps: 3 },
+      { name: "4", label: "4", reps: 4 },
+      { name: "5", label: "5", reps: 5 },
+      { name: "6", label: "6", reps: 6 },
+      { name: "7", label: "7", reps: 7 },
+      { name: "8", label: "8", reps: 8 },
+      { name: "9", label: "9", reps: 9 },
+      { name: "10", label: "10", reps: 10 },
+      { name: "Valet", label: "V", reps: 11 },
+      { name: "Dame", label: "D", reps: 12 },
+      { name: "Roi", label: "R", reps: 13 }
+    ];
+
+    const cardEl = document.getElementById("card");
+    const cardsViewEl = document.getElementById("cardsView");
+    const cardsModeEl = document.getElementById("cardsMode");
+    const cardsHeaderEl = document.getElementById("cardsHeader");
+    const tabataModeEl = document.getElementById("tabataMode");
+    const cardsModeButton = document.getElementById("cardsModeButton");
+    const tabataModeButton = document.getElementById("tabataModeButton");
+    const totalCounterEl = document.getElementById("totalCounter");
+    const remainingEl = document.getElementById("remaining");
+    const legendEl = document.getElementById("legend");
+    const suitCounterEls = [...document.querySelectorAll(".suit-count")];
+    const historyEl = document.getElementById("history");
+    const drawButton = document.getElementById("drawButton");
+    const resetButton = document.getElementById("resetButton");
+    const timerEl = document.getElementById("timer");
+    const showTotalCounterInput = document.getElementById("showTotalCounter");
+    const showSuitCountersInput = document.getElementById("showSuitCounters");
+    const tabataPhaseEl = document.getElementById("tabataPhase");
+    const tabataTimeEl = document.getElementById("tabataTime");
+    const tabataRoundEl = document.getElementById("tabataRound");
+    const tabataWorkInput = document.getElementById("tabataWorkInput");
+    const tabataRestInput = document.getElementById("tabataRestInput");
+    const tabataRoundsInput = document.getElementById("tabataRoundsInput");
+    const tabataStartButton = document.getElementById("tabataStartButton");
+    const tabataResetButton = document.getElementById("tabataResetButton");
+    const tabataBackButton = document.getElementById("tabataBackButton");
+
+    const preferenceKey = "card-workout-display";
+    const tabataPreferenceKey = "card-workout-tabata-settings";
+    const sessionKey = "card-workout-session-v1";
+    let deck = [];
+    let history = [];
+    let currentCard = null;
+    let displayPreferences = loadDisplayPreferences();
+    let timerStartedAt = null;
+    let timerElapsedMs = 0;
+    let timerInterval = null;
+    let timerHasStarted = false;
+    let timerStopped = false;
+    let tabataTimer = null;
+    let tabataEndsAt = null;
+    let tabataRemainingMs = 0;
+    let tabataPhase = "ready";
+    let tabataRound = 1;
+    let tabataHasStarted = false;
+
+    function buildDeck() {
+      return suits.flatMap(suit =>
+        values.map(value => ({ ...suit, ...value }))
+      );
+    }
+
+    function shuffle(cards) {
+      for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cards[i], cards[j]] = [cards[j], cards[i]];
+      }
+      return cards;
+    }
+
+    function loadDisplayPreferences() {
+      const defaults = { showTotalCounter: true, showSuitCounters: true };
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(preferenceKey));
+        return saved ? { ...defaults, ...saved } : defaults;
+      } catch {
+        return defaults;
+      }
+    }
+
+    function saveDisplayPreferences() {
+      try {
+        localStorage.setItem(preferenceKey, JSON.stringify(displayPreferences));
+      } catch {
+        // L’application reste utilisable si le stockage local est indisponible.
+      }
+    }
+
+    function loadTabataPreferences() {
+      const defaults = { work: 20, rest: 10, rounds: 8 };
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(tabataPreferenceKey));
+        return saved ? { ...defaults, ...saved } : defaults;
+      } catch {
+        return defaults;
+      }
+    }
+
+    function applyTabataPreferences() {
+      const config = loadTabataPreferences();
+      tabataWorkInput.value = Math.max(1, Number(config.work) || 20);
+      tabataRestInput.value = Math.max(0, Number(config.rest) || 0);
+      tabataRoundsInput.value = Math.max(1, Number(config.rounds) || 8);
+    }
+
+    function saveTabataPreferences() {
+      try {
+        localStorage.setItem(tabataPreferenceKey, JSON.stringify(tabataConfig()));
+      } catch {
+        // L’application reste utilisable si le stockage local est indisponible.
+      }
+    }
+
+    function saveSession() {
+      try {
+        localStorage.setItem(sessionKey, JSON.stringify({
+          selectedMode: tabataModeEl.hidden ? "cards" : "tabata",
+          cards: {
+            deck,
+            history,
+            currentCard,
+            timer: {
+              hasStarted: timerHasStarted,
+              startedAt: timerStartedAt,
+              elapsedMs: timerElapsedMs,
+              stopped: timerStopped
+            }
+          },
+          tabata: {
+            config: tabataConfig(),
+            phase: tabataPhase,
+            round: tabataRound,
+            hasStarted: tabataHasStarted,
+            running: tabataTimer !== null,
+            endsAt: tabataEndsAt,
+            remainingMs: tabataRemainingMs
+          }
+        }));
+      } catch {
+        // L’application reste utilisable si le stockage local est indisponible.
+      }
+    }
+
+    function loadSession() {
+      try {
+        return JSON.parse(localStorage.getItem(sessionKey));
+      } catch {
+        return null;
+      }
+    }
+
+    function applyDisplayPreferences() {
+      totalCounterEl.hidden = !displayPreferences.showTotalCounter;
+      legendEl.classList.toggle("hide-counts", !displayPreferences.showSuitCounters);
+      showTotalCounterInput.checked = displayPreferences.showTotalCounter;
+      showSuitCountersInput.checked = displayPreferences.showSuitCounters;
+    }
+
+    function updateCounters() {
+      remainingEl.textContent = deck.length;
+
+      suitCounterEls.forEach(counterEl => {
+        const remainingForSuit = deck.filter(card => card.symbol === counterEl.dataset.suit).length;
+        counterEl.textContent = remainingForSuit;
+        counterEl.setAttribute("aria-label", `${remainingForSuit} cartes restantes`);
+      });
+    }
+
+    function renderHistory() {
+      historyEl.innerHTML = "";
+      history.forEach(entry => {
+        const item = document.createElement("li");
+        item.textContent = entry;
+        historyEl.append(item);
+      });
+    }
+
+    function renderCardPlaceholder() {
+      cardEl.innerHTML = `
+        <div class="placeholder">
+          Appuie sur<br><strong>« Tirer une carte »</strong>
+        </div>
+      `;
+    }
+
+    function vibrate() {
+      if ("vibrate" in navigator) navigator.vibrate(35);
+    }
+
+    function tabataConfig() {
+      return {
+        work: Math.max(1, Number(tabataWorkInput.value) || 20),
+        rest: Math.max(0, Number(tabataRestInput.value) || 0),
+        rounds: Math.max(1, Number(tabataRoundsInput.value) || 8)
+      };
+    }
+
+    function renderTabata() {
+      const config = tabataConfig();
+      const seconds = tabataPhase === "ready" ? config.work : Math.ceil(tabataRemainingMs / 1000);
+      const phaseLabel = { ready: "Prêt", work: "Effort", rest: "Repos", finished: "Terminé" }[tabataPhase];
+      tabataPhaseEl.textContent = phaseLabel;
+      tabataTimeEl.textContent = Math.max(0, seconds);
+      tabataRoundEl.textContent = tabataPhase === "finished"
+        ? `${config.rounds} tours terminés`
+        : `Tour ${tabataRound} / ${config.rounds} · ${config.work} s effort / ${config.rest} s repos`;
+      tabataStartButton.textContent = tabataTimer !== null ? "Pause" : tabataHasStarted && tabataPhase !== "finished" ? "Reprendre" : "Démarrer";
+      tabataStartButton.disabled = tabataPhase === "finished";
+    }
+
+    function startTabataPhase(phase, seconds) {
+      tabataPhase = phase;
+      tabataRemainingMs = seconds * 1000;
+      tabataEndsAt = Date.now() + tabataRemainingMs;
+      renderTabata();
+      saveSession();
+    }
+
+    function finishTabata() {
+      if (tabataTimer !== null) window.clearInterval(tabataTimer);
+      tabataTimer = null;
+      tabataEndsAt = null;
+      tabataRemainingMs = 0;
+      tabataPhase = "finished";
+      vibrate();
+      renderTabata();
+      saveSession();
+    }
+
+    function advanceTabata() {
+      const config = tabataConfig();
+      vibrate();
+
+      if (tabataPhase === "work" && config.rest > 0) {
+        startTabataPhase("rest", config.rest);
+      } else if (tabataRound >= config.rounds) {
+        finishTabata();
+      } else {
+        tabataRound += 1;
+        startTabataPhase("work", config.work);
+      }
+    }
+
+    function tickTabata() {
+      tabataRemainingMs = Math.max(0, tabataEndsAt - Date.now());
+      renderTabata();
+      if (tabataRemainingMs === 0) advanceTabata();
+    }
+
+    function toggleTabata() {
+      if (tabataTimer !== null) {
+        window.clearInterval(tabataTimer);
+        tabataTimer = null;
+        tabataRemainingMs = Math.max(0, tabataEndsAt - Date.now());
+        tabataEndsAt = null;
+        renderTabata();
+        saveSession();
+        return;
+      }
+
+      const config = tabataConfig();
+      if (!tabataHasStarted) {
+        tabataHasStarted = true;
+        tabataRound = 1;
+        startTabataPhase("work", config.work);
+      } else {
+        tabataEndsAt = Date.now() + tabataRemainingMs;
+      }
+      tabataTimer = window.setInterval(tickTabata, 200);
+      renderTabata();
+      saveSession();
+    }
+
+    function resetTabata() {
+      if (tabataTimer !== null) window.clearInterval(tabataTimer);
+      tabataTimer = null;
+      tabataEndsAt = null;
+      tabataRemainingMs = 0;
+      tabataPhase = "ready";
+      tabataRound = 1;
+      tabataHasStarted = false;
+      renderTabata();
+      saveSession();
+    }
+
+    function selectMode(mode) {
+      const isTabata = mode === "tabata";
+      cardsViewEl.hidden = isTabata;
+      tabataModeEl.hidden = !isTabata;
+      cardsModeButton.classList.toggle("active", !isTabata);
+      tabataModeButton.classList.toggle("active", isTabata);
+      cardsModeButton.setAttribute("aria-pressed", String(!isTabata));
+      tabataModeButton.setAttribute("aria-pressed", String(isTabata));
+      window.scrollTo({ top: 0, behavior: "instant" });
+      saveSession();
+    }
+
+    function formatDuration(milliseconds) {
+      const totalSeconds = Math.floor(milliseconds / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function updateTimer() {
+      if (timerStartedAt !== null) {
+        timerElapsedMs = Date.now() - timerStartedAt;
+      }
+      timerEl.textContent = formatDuration(timerElapsedMs);
+    }
+
+    function startTimer() {
+      if (timerHasStarted) return;
+
+      timerHasStarted = true;
+      timerStartedAt = Date.now();
+      timerElapsedMs = 0;
+      timerStopped = false;
+      updateTimer();
+      timerInterval = window.setInterval(updateTimer, 250);
+      saveSession();
+    }
+
+    function stopTimer() {
+      if (timerInterval !== null) window.clearInterval(timerInterval);
+      timerInterval = null;
+      updateTimer();
+      timerStartedAt = null;
+      timerStopped = true;
+      drawButton.disabled = true;
+      drawButton.textContent = "Terminé";
+      saveSession();
+    }
+
+    function renderCard(card) {
+      const redClass = card.color === "red" ? "red" : "";
+
+      cardEl.classList.remove("animate");
+      void cardEl.offsetWidth;
+      cardEl.classList.add("animate");
+
+      cardEl.innerHTML = `
+        <div class="corner top ${redClass}">
+          <span>${card.label}</span>
+          <span>${card.symbol}</span>
+        </div>
+
+        <div class="center ${redClass}">
+          <div class="suit">${card.symbol}</div>
+          <div class="reps">${card.reps}</div>
+          <div class="exercise">${card.exercise}</div>
+        </div>
+
+        <div class="corner bottom ${redClass}">
+          <span>${card.label}</span>
+          <span>${card.symbol}</span>
+        </div>
+      `;
+    }
+
+    function drawCard() {
+      if (deck.length === 0) return;
+
+      startTimer();
+      const card = deck.pop();
+      currentCard = card;
+      cardEl.classList.remove("empty");
+      cardEl.removeAttribute("aria-disabled");
+      renderCard(card);
+      vibrate();
+
+      history.unshift(`${card.name} de ${card.suitName} — ${card.reps} ${card.exercise.toLowerCase()}`);
+      renderHistory();
+
+      updateCounters();
+
+      if (deck.length === 0) {
+        drawButton.textContent = "Stop";
+        cardEl.classList.add("empty");
+        cardEl.setAttribute("aria-disabled", "true");
+        cardEl.setAttribute("aria-label", "Paquet terminé");
+      }
+      saveSession();
+    }
+
+    function reset() {
+      if (timerInterval !== null) window.clearInterval(timerInterval);
+      timerInterval = null;
+      timerStartedAt = null;
+      timerElapsedMs = 0;
+      timerHasStarted = false;
+      timerStopped = false;
+      timerEl.textContent = "00:00";
+      deck = shuffle(buildDeck());
+      history = [];
+      currentCard = null;
+      updateCounters();
+      renderHistory();
+      drawButton.disabled = false;
+      drawButton.textContent = "Tirer une carte";
+      cardEl.className = "playing-card empty";
+      cardEl.removeAttribute("aria-disabled");
+      cardEl.setAttribute("aria-label", "Tirer une carte");
+      renderCardPlaceholder();
+      saveSession();
+    }
+
+    function restoreSession() {
+      const session = loadSession();
+      if (!session?.cards || !Array.isArray(session.cards.deck)) return false;
+
+      deck = session.cards.deck;
+      history = Array.isArray(session.cards.history) ? session.cards.history : [];
+      currentCard = session.cards.currentCard || null;
+      const savedTimer = session.cards.timer || {};
+      timerHasStarted = Boolean(savedTimer.hasStarted);
+      timerStopped = Boolean(savedTimer.stopped);
+      timerElapsedMs = Number(savedTimer.elapsedMs) || 0;
+      timerStartedAt = timerHasStarted && !timerStopped && Number(savedTimer.startedAt)
+        ? Number(savedTimer.startedAt)
+        : null;
+
+      updateCounters();
+      renderHistory();
+      cardEl.className = "playing-card";
+      if (currentCard) renderCard(currentCard);
+      else {
+        cardEl.classList.add("empty");
+        renderCardPlaceholder();
+      }
+
+      if (deck.length === 0) {
+        cardEl.classList.add("empty");
+        cardEl.setAttribute("aria-disabled", "true");
+        cardEl.setAttribute("aria-label", "Paquet terminé");
+        drawButton.disabled = timerStopped;
+        drawButton.textContent = timerStopped ? "Terminé" : "Stop";
+      } else {
+        drawButton.disabled = false;
+        drawButton.textContent = "Tirer une carte";
+        cardEl.removeAttribute("aria-disabled");
+        cardEl.setAttribute("aria-label", "Tirer une carte");
+      }
+
+      updateTimer();
+      if (timerStartedAt !== null) timerInterval = window.setInterval(updateTimer, 250);
+      restoreTabata(session.tabata);
+      selectMode(session.selectedMode === "tabata" ? "tabata" : "cards");
+      return true;
+    }
+
+    function restoreTabata(savedTabata) {
+      if (!savedTabata) {
+        applyTabataPreferences();
+        renderTabata();
+        return;
+      }
+      const config = savedTabata.config || loadTabataPreferences();
+      tabataWorkInput.value = Math.max(1, Number(config.work) || 20);
+      tabataRestInput.value = Math.max(0, Number(config.rest) || 0);
+      tabataRoundsInput.value = Math.max(1, Number(config.rounds) || 8);
+      tabataPhase = ["ready", "work", "rest", "finished"].includes(savedTabata.phase) ? savedTabata.phase : "ready";
+      tabataRound = Math.max(1, Number(savedTabata.round) || 1);
+      tabataHasStarted = Boolean(savedTabata.hasStarted);
+      tabataRemainingMs = Math.max(0, Number(savedTabata.remainingMs) || 0);
+      tabataEndsAt = Number(savedTabata.endsAt) || null;
+
+      if (savedTabata.running && tabataEndsAt && tabataPhase !== "finished") {
+        const restoredConfig = tabataConfig();
+        while (tabataEndsAt <= Date.now()) {
+          if (tabataPhase === "work" && restoredConfig.rest > 0) {
+            tabataPhase = "rest";
+            tabataEndsAt += restoredConfig.rest * 1000;
+          } else if (tabataRound >= restoredConfig.rounds) {
+            tabataPhase = "finished";
+            tabataEndsAt = null;
+            tabataRemainingMs = 0;
+            break;
+          } else {
+            tabataRound += 1;
+            tabataPhase = "work";
+            tabataEndsAt += restoredConfig.work * 1000;
+          }
+        }
+        if (tabataEndsAt !== null) {
+          tabataRemainingMs = Math.max(0, tabataEndsAt - Date.now());
+          tabataTimer = window.setInterval(tickTabata, 200);
+        }
+      } else {
+        tabataEndsAt = null;
+      }
+      renderTabata();
+    }
+
+    function addTolerantPress(element, handler) {
+      let suppressClickUntil = 0;
+
+      element.addEventListener("pointerdown", event => {
+        if (event.pointerType !== "touch" && event.pointerType !== "pen") return;
+
+        event.preventDefault();
+        suppressClickUntil = Date.now() + 1000;
+        handler();
+      });
+
+      element.addEventListener("click", event => {
+        if (Date.now() < suppressClickUntil) {
+          event.preventDefault();
+          return;
+        }
+
+        handler();
+      });
+    }
+
+    addTolerantPress(drawButton, () => {
+      if (deck.length === 0) stopTimer();
+      else drawCard();
+    });
+    addTolerantPress(cardEl, drawCard);
+
+    cardEl.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        drawCard();
+      }
+    });
+
+    resetButton.addEventListener("click", reset);
+    cardsModeButton.addEventListener("click", () => selectMode("cards"));
+    tabataModeButton.addEventListener("click", () => selectMode("tabata"));
+    tabataBackButton.addEventListener("click", () => selectMode("cards"));
+    tabataStartButton.addEventListener("click", toggleTabata);
+    tabataResetButton.addEventListener("click", resetTabata);
+    [tabataWorkInput, tabataRestInput, tabataRoundsInput].forEach(input => {
+      input.addEventListener("change", () => {
+        if (!tabataHasStarted) renderTabata();
+        saveTabataPreferences();
+        saveSession();
+      });
+    });
+    showTotalCounterInput.addEventListener("change", () => {
+      displayPreferences.showTotalCounter = showTotalCounterInput.checked;
+      applyDisplayPreferences();
+      saveDisplayPreferences();
+    });
+    showSuitCountersInput.addEventListener("change", () => {
+      displayPreferences.showSuitCounters = showSuitCountersInput.checked;
+      applyDisplayPreferences();
+      saveDisplayPreferences();
+    });
+
+    applyDisplayPreferences();
+    applyTabataPreferences();
+    if (!restoreSession()) {
+      reset();
+      resetTabata();
+    }
+  </script>
+</body>
+</html>

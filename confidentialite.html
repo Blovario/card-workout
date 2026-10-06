@@ -6,7 +6,12 @@
   <meta name="theme-color" content="#080e10" />
   <meta name="description" content="Politique de confidentialité de l’application DeckBurn." />
   <link rel="canonical" href="https://deckburn.esref-aksu.com/confidentialite.html" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate" hreflang="fr" href="https://deckburn.esref-aksu.com/confidentialite.html" />
+  <link rel="alternate" hreflang="en" href="https://deckburn.esref-aksu.com/en/privacy.html" />
+  <link rel="alternate" hreflang="x-default" href="https://deckburn.esref-aksu.com/confidentialite.html" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=app-icon-1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=app-icon-1" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=app-icon-1" />
   <title>Politique de confidentialité | DeckBurn</title>
 
   <style>
@@ -49,6 +54,40 @@
     main {
       width: min(100%, 760px);
       margin: 0 auto;
+    }
+
+    .page-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .language-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--panel);
+    }
+
+    .language-switch a {
+      display: grid;
+      min-width: 35px;
+      min-height: 33px;
+      place-items: center;
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .language-switch a[aria-current="page"] {
+      background: var(--text);
+      color: var(--background);
     }
 
     .back-link {
@@ -170,7 +209,7 @@
 
 <body>
   <main>
-    <a class="back-link" href="index.html"><span aria-hidden="true">‹</span> DeckBurn</a>
+    <div class="page-top"><a class="back-link" href="/"><span aria-hidden="true">‹</span> DeckBurn</a><nav class="language-switch" aria-label="Choisir la langue"><a href="/confidentialite.html" lang="fr" aria-current="page">FR</a><a href="/en/privacy.html" lang="en">EN</a></nav></div>
 
     <header class="hero">
       <p class="eyebrow">DeckBurn</p>

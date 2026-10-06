@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#080e10" />
+  <meta name="description" content="Privacy policy for the DeckBurn app." />
+  <link rel="canonical" href="https://deckburn.esref-aksu.com/en/privacy.html" />
+  <link rel="alternate" hreflang="fr" href="https://deckburn.esref-aksu.com/confidentialite.html" />
+  <link rel="alternate" hreflang="en" href="https://deckburn.esref-aksu.com/en/privacy.html" />
+  <link rel="alternate" hreflang="x-default" href="https://deckburn.esref-aksu.com/confidentialite.html" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=app-icon-1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=app-icon-1" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=app-icon-1" />
+  <title>Privacy policy | DeckBurn</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #080e10;
+      --background-top: #14221b;
+      --panel: rgba(255, 255, 255, .035);
+      --border: rgba(201, 255, 47, .18);
+      --text: #f4f2eb;
+      --muted: #adb9af;
+      --accent: #c9ff2f;
+      --accent-text: #0b110b;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-height: 100%;
+      background: var(--background);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      padding:
+        calc(24px + env(safe-area-inset-top))
+        18px
+        calc(32px + env(safe-area-inset-bottom));
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, .1), transparent 34rem),
+        linear-gradient(180deg, var(--background-top), var(--background));
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    main {
+      width: min(100%, 760px);
+      margin: 0 auto;
+    }
+
+    .page-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .language-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--panel);
+    }
+
+    .language-switch a {
+      display: grid;
+      min-width: 35px;
+      min-height: 33px;
+      place-items: center;
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .language-switch a[aria-current="page"] {
+      background: var(--text);
+      color: var(--background);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 28px;
+      color: var(--text);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .back-link span {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--panel);
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .hero {
+      margin-bottom: 24px;
+      padding: clamp(24px, 6vw, 44px);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: rgba(0, 0, 0, .28);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, .2);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 8vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+
+    .intro {
+      max-width: 62ch;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .updated {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    article {
+      display: grid;
+      gap: 14px;
+    }
+
+    section {
+      padding: clamp(20px, 5vw, 30px);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    p { margin: 0 0 12px; }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 22px;
+    }
+
+    li + li { margin-top: 8px; }
+
+    a {
+      color: var(--accent);
+      text-underline-offset: 3px;
+    }
+
+    .identity {
+      color: var(--muted);
+    }
+
+    .identity strong { color: var(--text); }
+
+    footer {
+      padding: 30px 8px 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div class="page-top"><a class="back-link" href="/en/"><span aria-hidden="true">‹</span> DeckBurn</a><nav class="language-switch" aria-label="Choose language"><a href="/confidentialite.html" lang="fr">FR</a><a href="/en/privacy.html" lang="en" aria-current="page">EN</a></nav></div>
+
+    <header class="hero">
+      <p class="eyebrow">DeckBurn</p>
+      <h1>Privacy policy</h1>
+      <p class="intro">This policy explains how data is used when you use the DeckBurn app on iOS.</p>
+      <time class="updated" datetime="2026-09-17">Last updated: September 17, 2026</time>
+    </header>
+
+    <article>
+      <section>
+        <h2>1. Data controller</h2>
+        <p class="identity"><strong>ESREF AKSU (AKSU WORKS)</strong><br />Individual entrepreneur, SIREN 992 228 031<br />1 rue Marguerin, 75014 Paris, France</p>
+        <p>Any privacy question or request to exercise your rights may be sent by post to this business address.</p>
+      </section>
+
+      <section>
+        <h2>2. Data stored by DeckBurn</h2>
+        <p>DeckBurn does not require an account and does not directly collect your name, email address, or health data.</p>
+        <p>The following information is stored only on your device:</p>
+        <ul>
+          <li>your display preferences;</li>
+          <li>Tabata timer settings;</li>
+          <li>the current workout state and the history of drawn cards.</li>
+        </ul>
+        <p>This information is used to restore your settings and workout. It is not sent to AKSU WORKS and is deleted when you clear the app's data or uninstall it.</p>
+      </section>
+
+      <section>
+        <h2>3. Advertising and data processed by Google</h2>
+        <p>The app uses Google AdMob to display ads and Google User Messaging Platform (UMP) to collect and remember your privacy choices.</p>
+        <p>Depending on your device, region, and choices, Google and its partners may process:</p>
+        <ul>
+          <li>your IP address and an approximate location inferred from it;</li>
+          <li>device identifiers or advertising identifiers when their use is permitted;</li>
+          <li>technical information, diagnostics, and performance data;</li>
+          <li>interactions with ads, including impressions and clicks.</li>
+        </ul>
+        <p>This processing may be used to deliver ads, measure their performance, limit their frequency, prevent fraud, and, when you consent, personalize ads. See Google's information about <a href="https://policies.google.com/technologies/partner-sites?hl=en" rel="noopener noreferrer">data from partner apps</a> and its <a href="https://policies.google.com/privacy?hl=en" rel="noopener noreferrer">privacy policy</a>.</p>
+      </section>
+
+      <section>
+        <h2>4. Consent and control of your choices</h2>
+        <p>Where required by law, a Google consent form is shown before any advertising request. DeckBurn does not request Apple's App Tracking Transparency (ATT) permission to track you across apps and websites.</p>
+        <p>You can refuse tracking or personalization without losing access to DeckBurn's features. Where required in your region, the “Ad privacy choices” link in the app lets you change your decision at any time.</p>
+      </section>
+
+      <section>
+        <h2>5. Legal bases</h2>
+        <p>Depending on the processing, advertising data is processed on the basis of:</p>
+        <ul>
+          <li>your consent, particularly for personalization and access to certain identifiers;</li>
+          <li>applicable legal obligations;</li>
+          <li>the legitimate interests of Google or its partners, where permitted by law, particularly for security, fraud prevention, and certain advertising measurements.</li>
+        </ul>
+        <p>The applicable purposes and legal bases are detailed in the privacy form shown in the app.</p>
+      </section>
+
+      <section>
+        <h2>6. Recipients and transfers</h2>
+        <p>AKSU WORKS does not sell personal data. Advertising-related data may be processed by Google Ireland Limited, Google group companies, and the ad technology providers listed in the consent form.</p>
+        <p>Some recipients may be located outside the European Economic Area. Google states that these transfers are governed by mechanisms recognized under applicable law, including standard contractual clauses where necessary.</p>
+      </section>
+
+      <section>
+        <h2>7. Retention periods</h2>
+        <p>Settings and workouts stored locally remain on your device until you reset them, clear the app's data, or uninstall it. For data processed by Google and its partners, retention periods are defined in their own policies and according to your consent choices.</p>
+      </section>
+
+      <section>
+        <h2>8. Your rights</h2>
+        <p>Depending on your situation, you may request access to, correction or deletion of, restriction of or objection to the processing of your data, and withdraw your consent. You can send your request to the data controller by post at the address above.</p>
+        <p>You can also lodge a complaint with the <a href="https://www.cnil.fr/fr/plaintes" rel="noopener noreferrer">French Data Protection Authority (CNIL)</a>.</p>
+      </section>
+
+      <section>
+        <h2>9. Children</h2>
+        <p>DeckBurn is a general workout app and is not specifically intended for children. AKSU WORKS does not knowingly collect personal data directly from children.</p>
+      </section>
+
+      <section>
+        <h2>10. Changes</h2>
+        <p>This policy may be updated to reflect changes to the app, advertising services, or applicable law. The update date at the top of this page identifies the current version.</p>
+      </section>
+    </article>
+
+    <footer>© 2026 AKSU WORKS : DeckBurn</footer>
+  </main>
+</body>
+</html>

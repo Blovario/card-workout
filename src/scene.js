@@ -4,6 +4,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 const acid = 0xc9ff2f;
 const cardInk = '#0b1110';
 const cardIvory = '#f4f1e8';
+const isEnglish = document.documentElement.lang.toLowerCase().startsWith('en');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const stages = [...document.querySelectorAll('[data-scene]')];
 const animationStart = performance.now();
@@ -95,9 +96,9 @@ const textures = {
   back: textureFromCanvas(drawBack),
   heart: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♥', 'A', 'BURPEES')),
   diamond: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♦', 'A', 'SQUATS')),
-  club: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♣', 'A', 'POMPES')),
-  spade: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♠', 'A', 'ABDOS')),
-  king: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♣', 'K', 'POMPES'))
+  club: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♣', 'A', isEnglish ? 'PUSH-UPS' : 'POMPES')),
+  spade: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♠', 'A', isEnglish ? 'ABS' : 'ABDOS')),
+  king: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♣', 'K', isEnglish ? 'PUSH-UPS' : 'POMPES'))
 };
 
 const cardBody = new RoundedBoxGeometry(1.93, 2.78, 0.12, 3, 0.07);

@@ -13,6 +13,11 @@ img,svg{display:block;max-width:100%}
 .skip-link:focus{top:1rem}
 .site-shell{max-width:1800px;margin:auto;overflow:hidden}
 .site-header{height:92px;padding:0 clamp(22px,5vw,88px);display:flex;align-items:center;justify-content:space-between;gap:24px;border-bottom:1px solid var(--line);position:relative;z-index:5;background:rgba(8,14,16,.94)}
+.header-actions{display:flex;align-items:center;gap:12px;flex:none}
+.language-switch{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid #34423c;border-radius:9px;background:#101819}
+.language-switch a{min-width:35px;min-height:33px;display:grid;place-items:center;border-radius:6px;color:#aebbb2;font-size:11px;font-weight:900;letter-spacing:.04em}
+.language-switch a:hover{color:var(--white)}
+.language-switch a[aria-current="page"]{background:var(--white);color:#0b110b}
 .wordmark{font-size:25px;font-weight:1000;letter-spacing:-.1em;line-height:.77;display:inline-flex;flex-direction:column;min-width:95px;white-space:nowrap}
 .wordmark strong{color:var(--acid);font-weight:1000}
 .main-nav{display:flex;align-items:center;gap:clamp(20px,3vw,48px)}
@@ -344,6 +349,8 @@ body::before{display:none}
   .hero-copy,.hero-stage{min-width:0}
   .hero h1{font-size:clamp(40px,12.6vw,48px)}
 }
+@media(max-width:860px){.main-nav{display:none}}
+@media(max-width:600px){.header-actions{gap:7px}.language-switch a{min-width:31px;min-height:30px;font-size:10px}}
 @media(min-width:921px){
   .friends-visual>.webgl-art canvas{mask-image:radial-gradient(ellipse 75% 67% at 25% 30%,#000 76%,transparent 100%)}
   .results-visual>.webgl-art canvas{mask-image:radial-gradient(ellipse 75% 67% at 75% 30%,#000 76%,transparent 100%)}

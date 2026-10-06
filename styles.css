@@ -301,3 +301,46 @@ h2{font-size:clamp(48px,5.2vw,87px);line-height:.96;margin:0}
 @media(max-width:920px){.concept-scene{height:480px;min-height:0}}
 @media(max-width:600px){.concept-scene{height:340px}.phone-hero{animation-duration:8s}.exercise-label{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.motion-ready{opacity:1;transform:none}}
+
+/* One continuous atmosphere behind the live 3D objects. */
+body::before{display:none}
+.site-shell{
+  background:
+    radial-gradient(ellipse 58% 650px at 76% 10%,rgba(145,205,42,.105),transparent 76%),
+    radial-gradient(ellipse 62% 640px at 67% 30%,rgba(114,163,37,.075),transparent 76%),
+    radial-gradient(ellipse 65% 760px at 27% 54%,rgba(123,177,36,.07),transparent 78%),
+    radial-gradient(ellipse 62% 700px at 71% 74%,rgba(119,176,34,.08),transparent 78%),
+    #080e10;
+}
+.hero,.concept,.how,.friends,.results,.faq{background:transparent;border:0}
+.hero-stage,.how-visual,.friends-visual,.results-visual{background:transparent}
+.webgl-art:not(.webgl-unavailable){background:transparent!important}
+.webgl-art canvas{mask-image:radial-gradient(ellipse 88% 72% at 56% 29%,#000 47%,transparent 100%)}
+.hero-stage>.webgl-art canvas{mask-image:radial-gradient(ellipse 70% 75% at 70% 32%,#000 48%,transparent 100%)}
+.how-visual canvas{mask-image:radial-gradient(ellipse 88% 72% at 50% 30%,#000 48%,transparent 100%)}
+.friends-visual>.webgl-art canvas,.results-visual>.webgl-art canvas{mask-image:radial-gradient(ellipse 85% 75% at 50% 32%,#000 49%,transparent 100%)}
+.hero-stage::after,.friends-visual::after,.results-visual::after{display:none}
+.ticker{background:transparent;border-top:1px solid rgba(214,241,216,.11);border-bottom:0}
+.exercise-grid{border-top-color:rgba(214,241,216,.11)}
+.download{background:transparent;border-top:1px solid rgba(214,241,216,.11)}
+.site-footer{background:transparent;border-top:1px solid rgba(214,241,216,.08)}
+.friends,.friends-visual{min-height:720px}
+.results,.results-visual{min-height:700px}
+.phone-code{width:min(21vw,285px);transform:rotate(-8deg)}
+.phone-share{width:min(21vw,285px);transform:rotate(6deg)}
+@media(max-width:920px){
+  .hero-stage>.webgl-art canvas{mask-image:radial-gradient(ellipse 92% 73% at 54% 30%,#000 50%,transparent 100%)}
+  .friends-visual{min-height:680px}
+  .results-visual{min-height:660px}
+  .phone-code,.phone-share{width:275px}
+}
+@media(max-width:600px){
+  .friends-visual{min-height:600px}
+  .results-visual{height:560px;min-height:560px}
+  .phone-code{width:min(60vw,230px)}
+  .phone-share{width:min(51vw,205px)}
+}
+@media(max-width:380px){
+  .hero-copy,.hero-stage{min-width:0}
+  .hero h1{font-size:clamp(40px,12.6vw,48px)}
+}

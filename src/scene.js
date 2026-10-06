@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 const acid = 0xc9ff2f;
+const cardInk = '#0b1110';
+const cardIvory = '#f4f1e8';
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const stages = [...document.querySelectorAll('[data-scene]')];
 const animationStart = performance.now();
@@ -19,7 +21,7 @@ function textureFromCanvas(draw) {
 }
 
 function drawBack(ctx, width, height) {
-  ctx.fillStyle = '#0b110f';
+  ctx.fillStyle = cardInk;
   ctx.fillRect(0, 0, width, height);
   ctx.strokeStyle = '#a9e129';
   ctx.lineWidth = 7;
@@ -52,15 +54,21 @@ function drawBack(ctx, width, height) {
   ctx.restore();
 }
 
-function drawFace(ctx, width, height, suit, rank, label, dark) {
-  ctx.fillStyle = dark ? '#111615' : '#f4f1e8';
+function drawFace(ctx, width, height, suit, rank, label) {
+  ctx.fillStyle = cardInk;
   ctx.fillRect(0, 0, width, height);
-  ctx.strokeStyle = dark ? 'rgba(201, 255, 47, .62)' : 'rgba(18, 27, 24, .18)';
+  const sheen = ctx.createLinearGradient(0, 0, width, height);
+  sheen.addColorStop(0, 'rgba(255,255,255,.065)');
+  sheen.addColorStop(0.46, 'rgba(255,255,255,0)');
+  sheen.addColorStop(1, 'rgba(0,0,0,.12)');
+  ctx.fillStyle = sheen;
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = 'rgba(201, 255, 47, .62)';
   ctx.lineWidth = 5;
   ctx.strokeRect(17, 17, width - 34, height - 34);
   ctx.lineWidth = 2;
   ctx.strokeRect(34, 34, width - 68, height - 68);
-  const color = suit === '♥' || suit === '♦' ? '#f44350' : suit === '♣' ? '#c9ff2f' : '#101714';
+  const color = suit === '♥' || suit === '♦' ? '#f44350' : suit === '♣' ? '#c9ff2f' : cardIvory;
   ctx.fillStyle = color;
   ctx.textAlign = 'left';
   ctx.font = '900 68px Arial, sans-serif';
@@ -85,22 +93,21 @@ function drawFace(ctx, width, height, suit, rank, label, dark) {
 
 const textures = {
   back: textureFromCanvas(drawBack),
-  heart: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♥', 'A', 'BURPEES', true)),
-  diamond: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♦', 'A', 'SQUATS', true)),
-  club: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♣', 'A', 'POMPES', true)),
-  spade: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♠', 'A', 'ABDOS', false)),
-  king: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♣', 'K', 'POMPES', false))
+  heart: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♥', 'A', 'BURPEES')),
+  diamond: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♦', 'A', 'SQUATS')),
+  club: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♣', 'A', 'POMPES')),
+  spade: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♠', 'A', 'ABDOS')),
+  king: textureFromCanvas((ctx, w, h) => drawFace(ctx, w, h, '♣', 'K', 'POMPES'))
 };
 
 const cardBody = new RoundedBoxGeometry(1.93, 2.78, 0.12, 3, 0.07);
 const cardFace = new THREE.PlaneGeometry(1.89, 2.74);
-const cardEdge = new THREE.MeshPhysicalMaterial({ color: 0x222b24, metalness: 0.23, roughness: 0.38, clearcoat: 0.65 });
-const lightCardEdge = new THREE.MeshPhysicalMaterial({ color: 0xb7b6a9, metalness: 0.08, roughness: 0.58, clearcoat: 0.22 });
+const cardEdge = new THREE.MeshPhysicalMaterial({ color: 0x202924, metalness: 0.22, roughness: 0.32, clearcoat: 0.68 });
 const faceMaterials = Object.fromEntries(Object.entries(textures).map(([name, map]) => [name, new THREE.MeshBasicMaterial({ map, toneMapped: false, side: THREE.FrontSide })]));
 
 function card(type = 'back') {
   const group = new THREE.Group();
-  const body = new THREE.Mesh(cardBody, type === 'spade' || type === 'king' ? lightCardEdge : cardEdge);
+  const body = new THREE.Mesh(cardBody, cardEdge);
   body.castShadow = true;
   body.receiveShadow = true;
   group.add(body);
@@ -155,7 +162,7 @@ function rockGeometry(seed, subdivisions = 5) {
   return geometry;
 }
 
-const rockMaterial = new THREE.MeshStandardMaterial({ color: 0x30352f, roughness: 1, metalness: 0.04 });
+const rockMaterial = new THREE.MeshStandardMaterial({ color: 0x222b26, roughness: 1, metalness: 0.03 });
 new THREE.TextureLoader().load('/assets/stone-albedo.webp', texture => {
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
@@ -172,10 +179,10 @@ function addGround(scene, variant) {
   const ground = new THREE.Group();
   for (let i = 0; i < 15; i += 1) {
     const rock = new THREE.Mesh(rockGeometry(i + variant * 4), rockMaterial);
-    const x = (i % 5 - 2) * 2.2 + Math.sin(i * 4.1 + variant) * 0.38;
+    const x = (i % 5 - 2) * 1.8 + Math.sin(i * 4.1 + variant) * 0.28;
     const z = -1.5 + Math.floor(i / 5) * 1.75;
-    rock.position.set(x, -3.2 + Math.sin(i * 2.2) * 0.18, z);
-    rock.scale.set(1.6 + (i % 3) * 0.24, 0.57 + (i % 4) * 0.12, 1.12 + (i % 2) * 0.2);
+    rock.position.set(x, -3.33 + Math.sin(i * 2.2) * 0.15, z);
+    rock.scale.set(1.6 + (i % 3) * 0.24, 0.48 + (i % 4) * 0.09, 1.12 + (i % 2) * 0.2);
     rock.rotation.set(i * 0.31, i * 0.79, i * 0.27);
     rock.castShadow = true;
     rock.receiveShadow = true;
@@ -183,7 +190,7 @@ function addGround(scene, variant) {
   }
   for (let i = 0; i < 24; i += 1) {
     const stone = new THREE.Mesh(rockGeometry(i + 90 + variant, 2), rockMaterial);
-    stone.position.set(Math.sin(i * 8.2) * 5.4, -2.72 + Math.cos(i * 2.9) * 0.1, -0.2 + (i % 5) * 0.55);
+    stone.position.set(Math.sin(i * 8.2) * 4.3, -2.86 + Math.cos(i * 2.9) * 0.1, -0.2 + (i % 5) * 0.55);
     const size = 0.14 + (i % 5) * 0.06;
     stone.scale.set(size * 1.55, size * 0.62, size);
     stone.rotation.set(i * 0.38, i * 0.7, i * 0.19);
@@ -192,12 +199,12 @@ function addGround(scene, variant) {
   }
   for (let i = 0; i < 9; i += 1) {
     const crack = new THREE.Mesh(new THREE.BoxGeometry(0.6 + (i % 3) * 0.4, 0.012, 0.018), crackMaterial);
-    crack.position.set((i - 4) * 1.4, -2.72 + Math.sin(i * 1.9) * 0.05, 0.1 + (i % 3) * 0.35);
+    crack.position.set((i - 4) * 1.1, -2.86 + Math.sin(i * 1.9) * 0.05, 0.1 + (i % 3) * 0.35);
     crack.rotation.z = Math.sin(i * 3.4) * 0.4;
     ground.add(crack);
   }
   scene.add(ground);
-  glow(scene, 0, -2.5, -1.5, 11, 3.5, 0.65);
+  glow(scene, 0, -2.75, -1.5, 11, 3.2, 0.42);
 }
 
 function putCard(root, type, x, y, z, rz, ry = 0, scale = 1) {
@@ -246,14 +253,15 @@ function buildModel(scene, kind) {
   } else {
     const isHero = kind === 'hero';
     const isResult = kind === 'results';
-    const spread = isHero ? 2.7 : 2.65;
+    const leftSpread = isHero || isResult ? 2.15 : 2.65;
+    const rightSpread = kind === 'friends' ? 2.05 : 2.65;
     for (let i = 0; i < 7; i += 1) {
       const side = i % 2 ? 1 : -1;
       const item = putCard(root, 'back', side * (1.7 + (i % 3) * 0.36), -0.76 + (i % 3) * 0.16, -1.1 + i * 0.035, side * (0.26 + i * 0.035), side * 0.12, 0.92);
       animated.push(item);
     }
-    animated.push(putCard(root, isResult ? 'heart' : 'spade', -spread, 1.08, 0.25, 0.22, -0.17, kind === 'friends' ? 0.86 : 1.02));
-    animated.push(putCard(root, kind === 'friends' ? 'back' : isResult ? 'spade' : 'king', spread, 0.78, 0.3, -0.23, 0.19, 1.02));
+    animated.push(putCard(root, isResult ? 'heart' : 'spade', -leftSpread, 1.08, 0.25, 0.22, -0.17, kind === 'friends' ? 0.86 : 1.02));
+    animated.push(putCard(root, kind === 'friends' ? 'back' : isResult ? 'spade' : 'king', rightSpread, 0.78, 0.3, -0.23, 0.19, 1.02));
     glow(scene, 0, 0.2, -2.2, 9, 8, 0.2);
   }
   const points = new Float32Array(48 * 3);
@@ -287,7 +295,7 @@ function createStage(element) {
   key.shadow.camera.far = 25;
   key.shadow.bias = -0.0006;
   scene.add(key);
-  const rim = new THREE.PointLight(acid, 27, 14, 2);
+  const rim = new THREE.PointLight(acid, 20, 14, 2);
   rim.position.set(2, -1.4, 2.6);
   scene.add(rim);
   const side = new THREE.PointLight(0x9add38, 10, 12, 2);

@@ -68,7 +68,7 @@ function drawFace(ctx, width, height, suit, rank, label) {
   ctx.strokeRect(17, 17, width - 34, height - 34);
   ctx.lineWidth = 2;
   ctx.strokeRect(34, 34, width - 68, height - 68);
-  const color = suit === '♥' || suit === '♦' ? '#f44350' : suit === '♣' ? '#c9ff2f' : cardIvory;
+  const color = suit === '♥' || suit === '♦' ? '#f44350' : cardIvory;
   ctx.fillStyle = color;
   ctx.textAlign = 'left';
   ctx.font = '900 68px Arial, sans-serif';

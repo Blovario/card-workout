@@ -344,3 +344,7 @@ body::before{display:none}
   .hero-copy,.hero-stage{min-width:0}
   .hero h1{font-size:clamp(40px,12.6vw,48px)}
 }
+@media(min-width:921px){
+  .friends-visual>.webgl-art canvas{mask-image:radial-gradient(ellipse 75% 67% at 25% 30%,#000 76%,transparent 100%)}
+  .results-visual>.webgl-art canvas{mask-image:radial-gradient(ellipse 75% 67% at 75% 30%,#000 76%,transparent 100%)}
+}
